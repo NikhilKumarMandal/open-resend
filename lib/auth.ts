@@ -5,6 +5,7 @@ import { nextCookies } from "better-auth/next-js";
 import { schema } from "@/db/schema/auth-schema";
 import { Resend } from "resend";
 import ForgotPasswordEmail from "@/components/emails/reset-password";
+import VerifyEmail from "@/components/emails/verify-email";
 
 const resend = new Resend(process.env.RESENDA_API_KEY as string)
 
@@ -20,6 +21,18 @@ export const auth = betterAuth({
         schema: schema,
     }),
 
+    emailVerification: {
+        sendVerificationEmail: async ({ user, url }) => {
+            await resend.emails.send({
+                from: `${process.env.EMAIL_SENDER_NAME} <${process.env.EMAIL_SENDER_ADDRESS}>`,
+                to: user.email,
+                subject: "Verify your email",
+                react: VerifyEmail({ username: user.name, verifyUrl: url }),
+            });
+        },
+        sendOnSignUp: true,
+    },
+
     emailAndPassword: {
         enabled: true,
         sendResetPassword: async ({ user, url }) => {
@@ -34,6 +47,7 @@ export const auth = betterAuth({
                 }),
             });
         },
+        requireEmailVerification: true,
     },
     socialProviders: {
         google: {
