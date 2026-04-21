@@ -6,8 +6,9 @@ import { schema } from "@/db/schema/auth-schema";
 import { Resend } from "resend";
 import ForgotPasswordEmail from "@/components/emails/reset-password";
 import VerifyEmail from "@/components/emails/verify-email";
+import { organization } from "better-auth/plugins"
 
-const resend = new Resend(process.env.RESENDA_API_KEY as string)
+const resend = new Resend(process.env.RESEND_API_KEY as string)
 
 export const auth = betterAuth({
     baseURL: process.env.BETTER_AUTH_URL,
@@ -49,6 +50,7 @@ export const auth = betterAuth({
         },
         requireEmailVerification: true,
     },
+
     socialProviders: {
         google: {
             accessType: "offline",
@@ -58,5 +60,5 @@ export const auth = betterAuth({
                 .GOOGLE_CLIENT_SECRET as string,
         },
     },
-    plugins: [nextCookies()]
+    plugins: [nextCookies(), organization()]
 });
