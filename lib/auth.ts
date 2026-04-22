@@ -10,6 +10,7 @@ import { organization } from "better-auth/plugins";
 import { lastLoginMethod } from "better-auth/plugins";
 import { getActiveOrganization } from "@/app/actions/organizations";
 import { ac,owner,member,admin } from "./auth/permissions";
+import OrganizationInvitationEmail from "@/components/emails/organization-invitation";
 
 const resend = new Resend(process.env.RESEND_API_KEY as string)
 
@@ -81,15 +82,30 @@ export const auth = betterAuth({
         },
     },
     plugins: [
-        nextCookies(),
         organization({
-        ac,
+            sendInvitationEmail: async (data) => {
+                const inviteLink = `${process.env.NEXT_PUBLIC_APP_URL}/api/accept-invitation/${data.id}`;
+
+                await resend.emails.send({
+                    from: `${process.env.EMAIL_SENDER_NAME} <${process.env.EMAIL_SENDER_ADDRESS}>`,
+                    to: data.email,
+                    subject: "You've been invited to join our organization",
+                    react: OrganizationInvitationEmail({
+                        email: data.email,
+                        invitedByUsername: data.inviter.user.name,
+                        invitedByEmail: data.inviter.user.email,
+                        teamName: data.organization.name,
+                        inviteLink,
+                    }),
+                });
+            },
         roles: {
             owner,
             admin,
             member
         }
     }),
-        lastLoginMethod()
+        lastLoginMethod(),
+        nextCookies()
     ]
 });
