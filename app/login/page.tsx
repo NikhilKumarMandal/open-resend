@@ -1,40 +1,102 @@
 "use client";
-import { Input } from "@/components/ui/input";
+
+import * as z from "zod";
 import Link from "next/link";
 import { useState } from "react";
+import { Input } from "@/components/ui/input";
 import { GoogleIcon, Logo } from "../auth/icons";
+import { useForm } from "@tanstack/react-form";
+import { authClient } from "@/lib/auth-client";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
+const formSchema = z.object({
+  email: z.email("Invalid email address"),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters"),
+});
 
-
+type SocialProvider = "google" | "github";
 
 
 export default function LoginPage() {
-  const [showPw] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  const FM = "'DM Mono', 'Courier New', monospace";
+  
   const FS = "Georgia, 'Times New Roman', serif";
 
 
+  const router = useRouter();
+  const [pendingProvider, setPendingProvider] =
+    useState<SocialProvider | null>(null);
+
+  const [isLoading, setIsLoading] =
+    useState<boolean>(false);
+
+  const form = useForm({
+    defaultValues: { email: "", password: "" },
+    validators: {
+      onChange: formSchema,
+    },
+    onSubmit: async ({ value }) => {
+      await authClient.signIn.email(
+        {
+          email: value.email,
+          password: value.password,
+          callbackURL: "/",
+        },
+        {
+          onRequest: (ctx) => {
+            setIsLoading(true);
+          },
+          onSuccess: (ctx) => {
+            setIsLoading(false);
+            toast.success("Account created successfully!");
+            router.push("/");
+          },
+          onError: (ctx) => {
+            setIsLoading(false);
+            toast.error(
+              ctx.error.message || "Registration failed.",
+            );
+          },
+        },
+      );
+    },
+  });
+
+
+  const handleSocialLogin = async (
+    provider: SocialProvider,
+  ) => {
+    setPendingProvider(provider);
+
+    try {
+      await authClient.signIn.social({
+        provider: provider,
+      });
+    } catch (err) {
+      setPendingProvider(null);
+      toast.error("An unexpected error");
+    }
+  };
 
   return (
     <div
       className="min-h-screen flex flex-col"
     >
- 
-      {/* ══ BODY ════════════════════════════════════════════ */}
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-10">
 
-        {/* Center logo */}
         <div className="mb-5">
           <Logo />
         </div>
 
-        {/* Card — 390px matches the screenshot */}
+
         <div className="w-full" style={{ maxWidth: "390px" }}>
 
-          {/* ── Top section ── */}
           <div
             className="px-6 pt-7 pb-6"
             style={{
@@ -56,32 +118,25 @@ export default function LoginPage() {
             </h1>
             <p className="mb-5" style={{ color: "#6a6a6a", fontSize: "0.85rem" }}>
               Don't have an account?{" "}
-              <a
+              <Link
                 href="#"
                 style={{ color: "#b8a98a", textDecoration: "underline", textUnderlineOffset: "2px" }}
                 onMouseEnter={e => (e.currentTarget.style.color = "#cbbfa0")}
                 onMouseLeave={e => (e.currentTarget.style.color = "#b8a98a")}
               >
                 Sign up
-              </a>
+              </Link>
             </p>
 
             {/* Google */}
             <button
-              className="w-full flex items-center justify-center gap-2 rounded-lg transition-opacity duration-150"
-              style={{
-                backgroundColor: "#fff",
-                border: "none",
-                padding: "11px 16px",
-                fontFamily: FM,
-                fontSize: "0.74rem",
-                fontWeight: 700,
-                letterSpacing: "0.09em",
-                color: "#111",
-                cursor: "pointer",
-              }}
+              className="text-center w-full cursor-pointer flex items-center justify-center font-semibold font-mono uppercase border transition-all ease-in duration-75 whitespace-nowrap select-none disabled:opacity-50 disabled:cursor-not-allowed gap-x-2 active:scale-95 text-sm leading-5 rounded-xl px-4 py-1.5 h-8 bg-stone-900 text-white border-2 border-stone-800 hover:bg-stone-800 disabled:bg-stone-700 disabled:border-stone-800 dark:bg-white dark:text-stone-900 dark:border-stone-300 dark:hover:bg-white/80"
+
               onMouseEnter={e => (e.currentTarget.style.opacity = "0.88")}
               onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
+              onClick={() => {
+                handleSocialLogin("google");
+              }}
             >
               <GoogleIcon />
               LOGIN WITH GOOGLE
@@ -91,7 +146,7 @@ export default function LoginPage() {
           {/* Hairline separator */}
           <div style={{ height: "1px", backgroundColor: "#111111" }} />
 
-          {/* ── Bottom section ── */}
+
           <div
             className="px-6 pt-5 pb-7"
             style={{
@@ -100,63 +155,139 @@ export default function LoginPage() {
             }}
           >
             {/* Email */}
-            <div className="mb-4">
-              <label
-                className="block mb-2 font-medium"
-                style={{ color: "#ddd", fontSize: "0.85rem" }}
-              >
-                Email <span style={{ color: "#e05252" }}>*</span>
-              </label>
-              <Input
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-              />
-            </div>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                form.handleSubmit();
+              }}>
 
-            {/* Password */}
-            <div className="mb-5">
-              <div className="flex items-center justify-between mb-2">
-                <label className="font-medium" style={{ color: "#ddd", fontSize: "0.85rem" }}>
-                  Password <span style={{ color: "#e05252" }}>*</span>
-                </label>
-                <Link
-                  href="#"
-                  className="no-underline"
-                  style={{ color: "#555", fontSize: "0.8rem" }}
-                  onMouseEnter={e => (e.currentTarget.style.color = "#888")}
-                  onMouseLeave={e => (e.currentTarget.style.color = "#555")}
-                >
-                  Forgot password?
-                </Link>
-              </div>
-              <Input
-                type={showPw ? "text" : "password"}
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-              />
-            </div>
+             
+              <FieldGroup className="flex flex-col gap-1">
+                {/* Email Field */}
+                <FieldLabel htmlFor="email">Email<span className="text-[#e05252]">*</span></FieldLabel>
+                <form.Field
+                  name="email"
+                  children={(field) => {
+                    const hasError =
+                      field.state.meta.isTouched &&
+                      field.state.meta.errors.length > 0;
+                    return (
+                      <div className="flex flex-col">
+                        <Input
+                          id={field.name}
+                          name={field.name}
+                          value={field.state.value}
+                          onBlur={field.handleBlur}
+                          onChange={(e) =>
+                            field.handleChange(e.target.value)
+                          }
+                          type="email"
+                          placeholder="Email address"
+                          className={cn(
+                            "w-full max-h-9 p-2 pl-3 outline-none text-sm rounded-lg border transition-all duration-100  bg - white text - stone - 900 border - stone - 300 hover:border-stone-400 focus-within:border-stone-500 dark:bg-stone-900 dark:text-stone-100 dark:border-stone-700dark:hover:border-stone-600 dark:focus-within:border-stone-500 hover:shadow-input-hover focus-within:shadow-input",
+                            hasError
+                              ? "border-red-500 focus:border-red-500 dark:border-red-500"
+                              : "focus:border-[#676767] dark:focus:border-stone-400"
+                          )}
+                        />
+                        {/* Reserved space for error to prevent layout shift */}
+                        <div className="min-h-5 px-1 py-0.5">
+                          {hasError && (
+                            <FieldError
+                              className="text-xs text-red-500 animate-in fade-in slide-in-from-top-1 duration-200"
+                              errors={field.state.meta.errors}
+                            />
+                          )}
+                        </div>
+                      </div>
+                    );
+                  }}
+                />
 
-            {/* Login button */}
-            <button
-              className="w-full rounded-lg transition-opacity duration-150"
-              style={{
-                backgroundColor: "#fff",
-                border: "none",
-                padding: "11px 16px",
-                fontFamily: FM,
-                fontSize: "0.74rem",
-                fontWeight: 700,
-                letterSpacing: "0.09em",
-                color: "#111",
-                cursor: "pointer",
-              }}
-              onMouseEnter={e => (e.currentTarget.style.opacity = "0.88")}
-              onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
-            >
-              LOGIN
-            </button>
+        
+                  <div className="flex items-center justify-between">
+                  <FieldLabel htmlFor="password">Password<span className="text-[#e05252]">*</span></FieldLabel>
+                    <Link
+                      href="#"
+                      className="no-underline"
+                      style={{ color: "#555", fontSize: "0.8rem" }}
+                      onMouseEnter={e => (e.currentTarget.style.color = "#888")}
+                      onMouseLeave={e => (e.currentTarget.style.color = "#555")}
+                    >
+                      Forgot password?
+                    </Link>
+                  </div>
+                {/* Password Field */}
+                <form.Field
+                  name="password"
+                  children={(field) => {
+                    const hasError =
+                      field.state.meta.isTouched &&
+                      field.state.meta.errors.length > 0;
+                    return (
+                      <div className="flex flex-col">
+                        <Input
+                          id={field.name}
+                          name={field.name}
+                          value={field.state.value}
+                          onBlur={field.handleBlur}
+                          onChange={(e) =>
+                            field.handleChange(e.target.value)
+                          }
+                          type="password"
+                          placeholder="Password"
+                          className={cn(
+                            "w-full max-h-9 p-2 pl-3 outline-none text-sm rounded-lg border transition-all duration-100  bg - white text - stone - 900 border - stone - 300 hover:border-stone-400 focus-within:border-stone-500 dark:bg-stone-900 dark:text-stone-100 dark:border-stone-700dark:hover:border-stone-600 dark:focus-within:border-stone-500 hover:shadow-input-hover focus-within:shadow-input",
+                            hasError
+                              ? "border-red-500 focus:border-red-500 dark:border-red-500"
+                              : "focus:border-[#676767] dark:focus:border-stone-400"
+                          )}
+                        />
+                        {/* Reserved space for error to prevent layout shift */}
+                        <div className="min-h-5 px-1 py-0.5">
+                          {hasError && (
+                            <FieldError
+                              className="text-xs text-red-500 animate-in fade-in slide-in-from-top-1 duration-200"
+                              errors={field.state.meta.errors}
+                            />
+                          )}
+                        </div>
+                      </div>
+                    );
+                  }}
+                />
+
+                {/* Submit Button */}
+                <form.Subscribe
+                  selector={(state) => [
+                    state.canSubmit,
+                    state.isSubmitting,
+                    state.isDirty,
+                  ]}
+                  children={([
+                    canSubmit,
+                    isSubmitting,
+                    isDirty,
+                  ]) => (
+                    <Button
+                      type="submit"
+                      className="text-sm cursor-pointer flex items-center justify-center font-semibold font-mono uppercase border transition-all ease-in duration-75 whitespace-nowrap text-center select-none disabled:opacity-50 disabled:cursor-not-allowed gap-x-2 active:scale-95 leading-5 rounded-xl px-4 py-1.5 h-8 bg-stone-900 text-white dark:bg-white dark:text-stone-900 border-2 border-stone-800 dark:border-stone-700 hover:bg-stone-700 dark:hover:bg-white/80"
+                      disabled={!canSubmit || !isDirty}>
+                      {isSubmitting || isLoading ? (
+                        <Loader2 className="size-5 animate-spin" />
+                      ) : (
+                        "Login"
+                      )}
+                    </Button>
+                  )}
+                />
+              </FieldGroup>
+
+            </form>
           </div>
+
+
         </div>
 
 
@@ -169,7 +300,7 @@ export default function LoginPage() {
             lineHeight: "1.6",
           }}
         >
-          By signing in, you agree to AutoSend{" "}
+          By signing in, you agree to OpenResend{" "}
           <Link
             href="#"
             style={{ color: "#5a5a5a", textDecoration: "underline", textUnderlineOffset: "2px" }}
