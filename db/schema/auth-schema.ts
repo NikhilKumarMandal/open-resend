@@ -6,6 +6,7 @@ import {
   boolean,
   index,
   uniqueIndex,
+  pgEnum,
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
@@ -93,6 +94,12 @@ export const organization = pgTable(
   },
   (table) => [uniqueIndex("organization_slug_uidx").on(table.slug)],
 );
+
+export type Organization = typeof organization.$inferSelect;
+
+export const role = pgEnum("role", ["member", "admin", "owner"]);
+
+export type Role = (typeof role.enumValues)[number];
 
 export const member = pgTable(
   "member",

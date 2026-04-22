@@ -9,6 +9,7 @@ import VerifyEmail from "@/components/emails/verify-email";
 import { organization } from "better-auth/plugins";
 import { lastLoginMethod } from "better-auth/plugins";
 import { getActiveOrganization } from "@/app/actions/organizations";
+import { ac,owner,member,admin } from "./auth/permissions";
 
 const resend = new Resend(process.env.RESEND_API_KEY as string)
 
@@ -79,5 +80,16 @@ export const auth = betterAuth({
             },
         },
     },
-    plugins: [nextCookies(), organization(), lastLoginMethod() ]
+    plugins: [
+        nextCookies(),
+        organization({
+        ac,
+        roles: {
+            owner,
+            admin,
+            member
+        }
+    }),
+        lastLoginMethod()
+    ]
 });
