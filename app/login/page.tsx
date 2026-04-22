@@ -24,11 +24,18 @@ const formSchema = z.object({
 type SocialProvider = "google" | "github";
 
 
+const LastBadge = () => (
+  <span className="absolute -top-2 -right-2 z-10 bg-[#4f39f6] text-white text-[10px] font-bold font-mono px-1.5 py-0.5 rounded-full leading-none">
+    Last
+  </span>
+);
+
+
 export default function LoginPage() {
   
   const FS = "Georgia, 'Times New Roman', serif";
 
-
+  const lastMethod = authClient.getLastUsedLoginMethod()
   const router = useRouter();
   const [pendingProvider, setPendingProvider] =
     useState<SocialProvider | null>(null);
@@ -112,6 +119,8 @@ export default function LoginPage() {
             </p>
 
             {/* Google */}
+            <div className="relative w-full">
+              {lastMethod === "google" && <LastBadge />}
             <button
               className="text-center w-full cursor-pointer flex items-center justify-center font-semibold font-mono uppercase border transition-all ease-in duration-75 whitespace-nowrap select-none disabled:opacity-50 disabled:cursor-not-allowed gap-x-2 active:scale-95 text-sm leading-5 rounded-xl px-4 py-1.5 h-8 bg-stone-900 text-white border-2 border-stone-800 hover:bg-stone-800 disabled:bg-stone-700 disabled:border-stone-800 dark:bg-white dark:text-stone-900 dark:border-stone-300 dark:hover:bg-white/80"
               onClick={() => {
@@ -120,7 +129,8 @@ export default function LoginPage() {
             >
               <GoogleIcon />
               LOGIN WITH GOOGLE
-            </button>
+              </button>
+            </div>
           </div>
 
           {/* Hairline separator */}
@@ -244,6 +254,8 @@ export default function LoginPage() {
                     isSubmitting,
                     isDirty,
                   ]) => (
+                    <div className="relative w-full">
+                      {lastMethod === "email" && <LastBadge />}
                     <Button
                       type="submit"
                       className="text-sm cursor-pointer flex items-center justify-center font-semibold font-mono uppercase border transition-all ease-in duration-75 whitespace-nowrap text-center select-none disabled:opacity-50 disabled:cursor-not-allowed gap-x-2 active:scale-95 leading-5 rounded-xl px-4 py-1.5 h-8 bg-stone-900 text-white dark:bg-white dark:text-stone-900 border-2 border-stone-800 dark:border-stone-700 hover:bg-stone-700 dark:hover:bg-white/80"
@@ -253,7 +265,8 @@ export default function LoginPage() {
                       ) : (
                         "Login"
                       )}
-                    </Button>
+                      </Button>
+                    </div>
                   )}
                 />
               </FieldGroup>
