@@ -97,32 +97,15 @@ export default function LoginPage() {
 
         <div className="w-full" style={{ maxWidth: "390px" }}>
 
-          <div
-            className="px-6 pt-7 pb-6"
-            style={{
-              backgroundColor: "#1e1e1e",
-              borderRadius: "14px 14px 0 0",
-            }}
-          >
-            <h1
-              style={{
-                color: "#ede0cc",
-                fontFamily: FS,
-                fontSize: "1.85rem",
-                fontWeight: 400,
-                letterSpacing: "-0.01em",
-                marginBottom: "6px",
-              }}
-            >
+          <div className="px-6 pt-7 pb-6 bg-[#1e1e1e] rounded-t-[14px]">
+            <h1 className="text-[#ede0cc] text-[1.85rem] font-normal tracking-[-0.01em] mb-[6px]" style={{ fontFamily: FS }}>
               Login
             </h1>
-            <p className="mb-5" style={{ color: "#6a6a6a", fontSize: "0.85rem" }}>
+            <p className="mb-5 text-[#6a6a6a] text-[0.85rem]">
               Don't have an account?{" "}
               <Link
                 href="#"
-                style={{ color: "#b8a98a", textDecoration: "underline", textUnderlineOffset: "2px" }}
-                onMouseEnter={e => (e.currentTarget.style.color = "#cbbfa0")}
-                onMouseLeave={e => (e.currentTarget.style.color = "#b8a98a")}
+                className="text-[#b8a98a] underline underline-offset-[2px] hover:text-[#cbbfa0]"
               >
                 Sign up
               </Link>
@@ -131,9 +114,6 @@ export default function LoginPage() {
             {/* Google */}
             <button
               className="text-center w-full cursor-pointer flex items-center justify-center font-semibold font-mono uppercase border transition-all ease-in duration-75 whitespace-nowrap select-none disabled:opacity-50 disabled:cursor-not-allowed gap-x-2 active:scale-95 text-sm leading-5 rounded-xl px-4 py-1.5 h-8 bg-stone-900 text-white border-2 border-stone-800 hover:bg-stone-800 disabled:bg-stone-700 disabled:border-stone-800 dark:bg-white dark:text-stone-900 dark:border-stone-300 dark:hover:bg-white/80"
-
-              onMouseEnter={e => (e.currentTarget.style.opacity = "0.88")}
-              onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
               onClick={() => {
                 handleSocialLogin("google");
               }}
@@ -144,16 +124,10 @@ export default function LoginPage() {
           </div>
 
           {/* Hairline separator */}
-          <div style={{ height: "1px", backgroundColor: "#111111" }} />
+          <div className="h-[1px] bg-[#111111]" />
 
 
-          <div
-            className="px-6 pt-5 pb-7"
-            style={{
-              backgroundColor: "#141414",
-              borderRadius: "0 0 14px 14px",
-            }}
-          >
+          <div className="px-6 pt-5 pb-7 bg-stone-900 dark:bg-[#141414] rounded-b-[14px]">
             {/* Email */}
             <form
               onSubmit={(e) => {
@@ -206,18 +180,18 @@ export default function LoginPage() {
                 />
 
         
-                  <div className="flex items-center justify-between">
-                  <FieldLabel htmlFor="password">Password<span className="text-[#e05252]">*</span></FieldLabel>
-                    <Link
-                      href="#"
-                      className="no-underline"
-                      style={{ color: "#555", fontSize: "0.8rem" }}
-                      onMouseEnter={e => (e.currentTarget.style.color = "#888")}
-                      onMouseLeave={e => (e.currentTarget.style.color = "#555")}
-                    >
-                      Forgot password?
-                    </Link>
-                  </div>
+                <div className="flex items-center justify-between">
+                  <FieldLabel htmlFor="password">
+                    Password <span className="text-[#e05252]">*</span>
+                  </FieldLabel>
+
+                  <Link
+                    href="#"
+                    className="text-[0.8rem] text-[#555] hover:text-[#888]"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
                 {/* Password Field */}
                 <form.Field
                   name="password"
@@ -290,31 +264,18 @@ export default function LoginPage() {
 
         </div>
 
-
-        <p
-          className="text-center mt-4"
-          style={{
-            color: "#444",
-            fontSize: "0.76rem",
-            maxWidth: "340px",
-            lineHeight: "1.6",
-          }}
-        >
+        <p className="text-center mt-4 text-[#444] text-[0.76rem] max-w-[340px] leading-[1.6]">
           By signing in, you agree to OpenResend{" "}
           <Link
             href="#"
-            style={{ color: "#5a5a5a", textDecoration: "underline", textUnderlineOffset: "2px" }}
-            onMouseEnter={e => (e.currentTarget.style.color = "#888")}
-            onMouseLeave={e => (e.currentTarget.style.color = "#5a5a5a")}
+            className="text-[#5a5a5a] underline underline-offset-[2px] hover:text-[#888]"
           >
             Terms
           </Link>{" "}
           and{" "}
           <Link
             href="#"
-            style={{ color: "#5a5a5a", textDecoration: "underline", textUnderlineOffset: "2px" }}
-            onMouseEnter={e => (e.currentTarget.style.color = "#888")}
-            onMouseLeave={e => (e.currentTarget.style.color = "#5a5a5a")}
+            className="text-[#5a5a5a] underline underline-offset-[2px] hover:text-[#888]"
           >
             Privacy Policy
           </Link>
