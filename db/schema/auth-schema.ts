@@ -8,6 +8,7 @@ import {
   uniqueIndex,
   pgEnum,
 } from "drizzle-orm/pg-core";
+import {domain} from "./domain-schema"
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -147,6 +148,7 @@ export const userRelations = relations(user, ({ many }) => ({
   accounts: many(account),
   members: many(member),
   invitations: many(invitation),
+  domains: many(domain),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
