@@ -8,6 +8,13 @@
       "when": 1777121572971,
       "tag": "0000_silky_timeslip",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1778585470386,
+      "tag": "0001_jazzy_whistler",
+      "breakpoints": true
     }
   ]
 }
