@@ -18,6 +18,7 @@ interface OrganizationInvitationEmailProps {
     invitedByEmail: string;
     teamName: string;
     inviteLink: string;
+    rejectLink: string;
 }
 
 const OrganizationInvitationEmail = (
@@ -65,6 +66,16 @@ const OrganizationInvitationEmail = (
                             >
                                 Accept Invitation
                             </Button>
+                            <Text className="m-0 mt-[16px] text-center text-[14px] text-gray-500">
+                                Not interested?{" "}
+                                <Link
+                                    className="text-gray-500 underline"
+                                    href={props.rejectLink}
+                                >
+                                    Reject this invitation
+                                </Link>
+                                .
+                            </Text>
                         </Section>
 
                         {/* Alternative Link */}

@@ -9,7 +9,7 @@ import VerifyEmail from "@/components/emails/verify-email";
 import { organization } from "better-auth/plugins";
 import { lastLoginMethod } from "better-auth/plugins";
 import { getActiveOrganization } from "@/app/actions/organizations";
-import { owner, member, admin } from "./auth/permissions";
+import { ac, owner, member, admin } from "./auth/permissions";
 import OrganizationInvitationEmail from "@/components/emails/organization-invitation";
 
 const resend = new Resend(process.env.RESEND_API_KEY as string)
@@ -83,8 +83,11 @@ export const auth = betterAuth({
     },
     plugins: [
         organization({
+            ac,
             sendInvitationEmail: async (data) => {
-                const inviteLink = `${process.env.NEXT_PUBLIC_APP_URL}/api/accept-invitation/${data.id}`;
+                const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? process.env.BETTER_AUTH_URL;
+                const inviteLink = `${appUrl}/api/accept-invitation/${data.id}`;
+                const rejectLink = `${appUrl}/api/reject-invitation/${data.id}`;
 
                 await resend.emails.send({
                     from: `${process.env.EMAIL_SENDER_NAME} <${process.env.EMAIL_SENDER_ADDRESS}>`,
@@ -96,6 +99,7 @@ export const auth = betterAuth({
                         invitedByEmail: data.inviter.user.email,
                         teamName: data.organization.name,
                         inviteLink,
+                        rejectLink,
                     }),
                 });
             },

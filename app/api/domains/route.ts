@@ -8,6 +8,11 @@ const addDomainSchema = z.object({
     domain: z.string().trim().min(1, "Domain is required"),
 });
 
+function getActiveOrganizationId(session: unknown) {
+    return (session as { session?: { activeOrganizationId?: string | null } })
+        .session?.activeOrganizationId;
+}
+
 function cors(response: NextResponse) {
     response.headers.set("Access-Control-Allow-Origin", "*");
     response.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
@@ -32,7 +37,10 @@ export async function GET() {
             ));
         };
 
-        const domains = await getUserDomains(session.user.id);
+        const domains = await getUserDomains(
+            session.user.id,
+            getActiveOrganizationId(session),
+        );
 
         return cors(NextResponse.json({
             success: true,
@@ -64,7 +72,11 @@ export async function POST(request: NextRequest) {
         const validatedData = addDomainSchema.parse(body);
         const { domain } = validatedData;
 
-        const result = await addDomain(session.user.id, domain);
+        const result = await addDomain(
+            session.user.id,
+            domain,
+            getActiveOrganizationId(session),
+        );
 
         return cors(NextResponse.json({
             success: true,

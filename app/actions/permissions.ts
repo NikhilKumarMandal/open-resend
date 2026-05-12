@@ -9,24 +9,19 @@ export const isAdmin = async () => {
             headers: await headers(),
             body: {
                 permissions: {
-                    organization: [ "update", "delete"],
+                    member: ["update", "delete"],
+                    invitation: ["create", "cancel"],
                 },
             },
         });
 
         if (error) {
-            return {
-                success: false,
-                error: error || "Failed to check permissions",
-            };
+            return false;
         }
 
         return success;
     } catch (error) {
         console.error(error);
-        return {
-            success: false,
-            error: error || "Failed to check permissions",
-        };
+        return false;
     }
 };

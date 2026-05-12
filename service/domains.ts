@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, or } from "drizzle-orm";
 import { db } from "@/db";
 import { domain, type Domain } from "@/db/schema/domain-schema";
 import { buildDNSRecords, registerDomainWithSES } from "@/lib/ses";
@@ -8,12 +8,22 @@ function normalizeDomain(domainName: string) {
     return domainName.trim().toLowerCase();
 }
 
-export async function getUserDomains(userId: string): Promise<Domain[]> {
+export async function getUserDomains(
+    userId: string,
+    organizationId?: string | null,
+): Promise<Domain[]> {
     try {
         return await db
             .select()
             .from(domain)
-            .where(eq(domain.userId, userId))
+            .where(
+                organizationId
+                    ? or(
+                        eq(domain.userId, userId),
+                        eq(domain.organizationId, organizationId),
+                    )
+                    : eq(domain.userId, userId),
+            )
             .orderBy(desc(domain.createdAt));
     } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : String(error);
@@ -21,7 +31,11 @@ export async function getUserDomains(userId: string): Promise<Domain[]> {
     }
 }
 
-export async function addDomain(userId: string, domainName: string): Promise<Domain> {
+export async function addDomain(
+    userId: string,
+    domainName: string,
+    organizationId?: string | null,
+): Promise<Domain> {
     const normalizedDomain = normalizeDomain(domainName);
 
     try {
@@ -37,6 +51,7 @@ export async function addDomain(userId: string, domainName: string): Promise<Dom
             .values({
                 id: randomUUID(),
                 userId,
+                organizationId,
                 domain: normalizedDomain,
                 status: "pending",
                 verificationToken: sesResult.verificationToken,

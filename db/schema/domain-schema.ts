@@ -9,7 +9,7 @@ import {
     uniqueIndex,
     pgEnum,
 } from "drizzle-orm/pg-core";
-import { user } from "./auth-schema";
+import { organization, user } from "./auth-schema";
 
 
 export const domainStatus = pgEnum("domain_status", [
@@ -47,6 +47,10 @@ export const domain = pgTable(
             .notNull()
             .references(() => user.id, { onDelete: "cascade" }),
 
+        organizationId: text("organization_id").references(() => organization.id, {
+            onDelete: "cascade",
+        }),
+
         domain: text("domain").notNull(),
 
         status: domainStatus("status").default("pending").notNull(),
@@ -70,6 +74,7 @@ export const domain = pgTable(
     (table) => [
         uniqueIndex("domain_domain_uidx").on(table.domain),
         index("domain_userId_idx").on(table.userId),
+        index("domain_organizationId_idx").on(table.organizationId),
         index("domain_status_idx").on(table.status),   
     ]
 );
@@ -80,6 +85,10 @@ export const domainRelations = relations(domain, ({ one }) => ({
     user: one(user, {
         fields: [domain.userId],
         references: [user.id],
+    }),
+    organization: one(organization, {
+        fields: [domain.organizationId],
+        references: [organization.id],
     }),
 }));
 
