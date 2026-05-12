@@ -9,7 +9,7 @@ import VerifyEmail from "@/components/emails/verify-email";
 import { organization } from "better-auth/plugins";
 import { lastLoginMethod } from "better-auth/plugins";
 import { getActiveOrganization } from "@/app/actions/organizations";
-import { ac,owner,member,admin } from "./auth/permissions";
+import { owner, member, admin } from "./auth/permissions";
 import OrganizationInvitationEmail from "@/components/emails/organization-invitation";
 
 const resend = new Resend(process.env.RESEND_API_KEY as string)

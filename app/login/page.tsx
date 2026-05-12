@@ -37,8 +37,6 @@ export default function LoginPage() {
 
   const lastMethod = authClient.getLastUsedLoginMethod()
   const router = useRouter();
-  const [pendingProvider, setPendingProvider] =
-    useState<SocialProvider | null>(null);
 
   const [isLoading, setIsLoading] =
     useState<boolean>(false);
@@ -56,10 +54,10 @@ export default function LoginPage() {
           callbackURL: "/",
         },
         {
-          onRequest: (ctx) => {
+          onRequest: () => {
             setIsLoading(true);
           },
-          onSuccess: (ctx) => {
+          onSuccess: () => {
             setIsLoading(false);
             toast.success("Account created successfully!");
             router.push("/");
@@ -79,14 +77,11 @@ export default function LoginPage() {
   const handleSocialLogin = async (
     provider: SocialProvider,
   ) => {
-    setPendingProvider(provider);
-
     try {
       await authClient.signIn.social({
         provider: provider,
       });
-    } catch (err) {
-      setPendingProvider(null);
+    } catch {
       toast.error("An unexpected error");
     }
   };
@@ -109,7 +104,7 @@ export default function LoginPage() {
               Login
             </h1>
             <p className="mb-5 text-[#6a6a6a] text-[0.85rem]">
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <Link
                 href="#"
                 className="text-[#b8a98a] underline underline-offset-[2px] hover:text-[#cbbfa0]"
@@ -150,9 +145,8 @@ export default function LoginPage() {
               <FieldGroup className="flex flex-col gap-1">
                 {/* Email Field */}
                 <FieldLabel htmlFor="email">Email<span className="text-[#e05252]">*</span></FieldLabel>
-                <form.Field
-                  name="email"
-                  children={(field) => {
+                <form.Field name="email">
+                  {(field) => {
                     const hasError =
                       field.state.meta.isTouched &&
                       field.state.meta.errors.length > 0;
@@ -187,7 +181,7 @@ export default function LoginPage() {
                       </div>
                     );
                   }}
-                />
+                </form.Field>
 
         
                 <div className="flex items-center justify-between">
@@ -203,9 +197,8 @@ export default function LoginPage() {
                   </Link>
                 </div>
                 {/* Password Field */}
-                <form.Field
-                  name="password"
-                  children={(field) => {
+                <form.Field name="password">
+                  {(field) => {
                     const hasError =
                       field.state.meta.isTouched &&
                       field.state.meta.errors.length > 0;
@@ -240,7 +233,7 @@ export default function LoginPage() {
                       </div>
                     );
                   }}
-                />
+                </form.Field>
 
                 {/* Submit Button */}
                 <form.Subscribe
@@ -248,8 +241,8 @@ export default function LoginPage() {
                     state.canSubmit,
                     state.isSubmitting,
                     state.isDirty,
-                  ]}
-                  children={([
+                  ]}>
+                  {([
                     canSubmit,
                     isSubmitting,
                     isDirty,
@@ -268,7 +261,7 @@ export default function LoginPage() {
                       </Button>
                     </div>
                   )}
-                />
+                </form.Subscribe>
               </FieldGroup>
 
             </form>

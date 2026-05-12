@@ -5,6 +5,7 @@ import {
     Head,
     Hr,
     Html,
+    Link,
     Section,
     Tailwind,
     Text,
@@ -74,9 +75,9 @@ const VerifyEmail = (props: VerifyEmailProps) => {
                             </Text>
 
                             <Text className="m-0 mt-[8px] text-center text-[12px] text-gray-400 leading-[16px]">
-                                <a className="text-gray-400 underline" href="/">
+                                <Link className="text-gray-400 underline" href="/">
                                     Unsubscribe
-                                </a>{" "}
+                                </Link>{" "}
                                 | © 2024 Company Name. All rights reserved.
                             </Text>
                         </Section>

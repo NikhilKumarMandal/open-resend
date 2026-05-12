@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
+import { addDomain, getUserDomains } from "@/service/domains";
 
 const addDomainSchema = z.object({
-    domain: z.string().min(1, "Domain is required"),
+    domain: z.string().trim().min(1, "Domain is required"),
 });
 
 function cors(response: NextResponse) {
@@ -14,14 +15,12 @@ function cors(response: NextResponse) {
     return response;
 }
 
-export async function GET(request: NextRequest) {
-    // Handle CORS preflight
-    if (request.method === "OPTIONS") {
-        return cors(new NextResponse(null, { status: 200 }));
-    }
+export function OPTIONS() {
+    return cors(new NextResponse(null, { status: 200 }));
+}
 
+export async function GET() {
     try {
-        // Check authorization
         const session = await auth.api.getSession({
             headers: await headers(),
         });
@@ -33,7 +32,7 @@ export async function GET(request: NextRequest) {
             ));
         };
 
-        const domains = await getUserDomains(user.id);
+        const domains = await getUserDomains(session.user.id);
 
         return cors(NextResponse.json({
             success: true,
@@ -49,13 +48,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-    // Handle CORS preflight
-    if (request.method === "OPTIONS") {
-        return cors(new NextResponse(null, { status: 200 }));
-    }
-
     try {
-        // Check authorization
         const session = await auth.api.getSession({
             headers: await headers(),
         });
@@ -67,12 +60,11 @@ export async function POST(request: NextRequest) {
             ));
         };
 
-        // Parse and validate request
         const body = await request.json();
         const validatedData = addDomainSchema.parse(body);
         const { domain } = validatedData;
 
-        const result = await addDomain(user.id, domain);
+        const result = await addDomain(session.user.id, domain);
 
         return cors(NextResponse.json({
             success: true,

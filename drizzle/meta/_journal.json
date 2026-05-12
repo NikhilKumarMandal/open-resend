@@ -15,6 +15,20 @@
       "when": 1778585470386,
       "tag": "0001_jazzy_whistler",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1778585634987,
+      "tag": "0002_outgoing_post",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1778586491985,
+      "tag": "0003_fantastic_gateway",
+      "breakpoints": true
     }
   ]
 }

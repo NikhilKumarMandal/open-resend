@@ -30,8 +30,6 @@ export default function SignUpPage() {
 
 
     const router = useRouter();
-    const [pendingProvider, setPendingProvider] =
-        useState<SocialProvider | null>(null);
 
     const [isLoading, setIsLoading] =
         useState<boolean>(false);
@@ -50,10 +48,10 @@ export default function SignUpPage() {
                     callbackURL: "/",
                 },
                 {
-                    onRequest: (ctx) => {
+                    onRequest: () => {
                         setIsLoading(true);
                     },
-                    onSuccess: (ctx) => {
+                    onSuccess: () => {
                         setIsLoading(false);
                         toast.success("Account created successfully!");
                         router.push("/");
@@ -73,14 +71,11 @@ export default function SignUpPage() {
     const handleSocialLogin = async (
         provider: SocialProvider,
     ) => {
-        setPendingProvider(provider);
-
         try {
             await authClient.signIn.social({
                 provider: provider,
             });
-        } catch (err) {
-            setPendingProvider(null);
+        } catch {
             toast.error("An unexpected error");
         }
     };
@@ -141,9 +136,8 @@ export default function SignUpPage() {
                             <FieldGroup className="flex flex-col gap-1">
                                 {/* Email Field */}
                                 <FieldLabel htmlFor="email">Email<span className="text-[#e05252]">*</span></FieldLabel>
-                                <form.Field
-                                    name="email"
-                                    children={(field) => {
+                                <form.Field name="email">
+                                    {(field) => {
                                         const hasError =
                                             field.state.meta.isTouched &&
                                             field.state.meta.errors.length > 0;
@@ -178,7 +172,7 @@ export default function SignUpPage() {
                                             </div>
                                         );
                                     }}
-                                />
+                                </form.Field>
 
 
 
@@ -186,9 +180,8 @@ export default function SignUpPage() {
                                     Password <span className="text-[#e05252]">*</span>
                                 </FieldLabel>
                                 {/* Password Field */}
-                                <form.Field
-                                    name="password"
-                                    children={(field) => {
+                                <form.Field name="password">
+                                    {(field) => {
                                         const hasError =
                                             field.state.meta.isTouched &&
                                             field.state.meta.errors.length > 0;
@@ -223,7 +216,7 @@ export default function SignUpPage() {
                                             </div>
                                         );
                                     }}
-                                />
+                                </form.Field>
 
                                 {/* Submit Button */}
                                 <form.Subscribe
@@ -231,8 +224,8 @@ export default function SignUpPage() {
                                         state.canSubmit,
                                         state.isSubmitting,
                                         state.isDirty,
-                                    ]}
-                                    children={([
+                                    ]}>
+                                    {([
                                         canSubmit,
                                         isSubmitting,
                                         isDirty,
@@ -248,7 +241,7 @@ export default function SignUpPage() {
                                             )}
                                         </Button>
                                     )}
-                                />
+                                </form.Subscribe>
                             </FieldGroup>
 
                         </form>
