@@ -5,6 +5,7 @@ const statement = {
     ...defaultStatements,
     project: ["create", "share", "update", "delete"],
     apiKey: ["read", "create", "delete"],
+    domain: ["read", "create", "delete"],
 } as const;
 
 const ac = createAccessControl(statement);
@@ -12,12 +13,14 @@ const ac = createAccessControl(statement);
 const member = ac.newRole({
     project: ["create"],
     apiKey: ["read"],
+    domain: ["read"],
     ac: ["read"],
 });
 
 const admin = ac.newRole({
     project: ["create", "update"],
     apiKey: ["read", "create"],
+    domain: ["read", "create"],
     organization: ["update"],
     invitation: ["create", "cancel"],
     member: ["create", "update", "delete"],
@@ -29,6 +32,7 @@ const admin = ac.newRole({
 const owner = ac.newRole({
     project: ["create", "update", "delete"],
     apiKey: ["read", "create", "delete"],
+    domain: ["read", "create", "delete"],
     organization: ["update", "delete"],
     invitation: ["create", "cancel"],
     member: ["create", "update", "delete"],
