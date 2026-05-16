@@ -148,3 +148,39 @@ export async function deleteAccessibleApiKey(input: {
     await db.delete(apiKey).where(eq(apiKey.id, input.apiKeyId));
     return true;
 }
+
+export async function authenticateApiKey(rawKey: string) {
+    const keyPrefix = rawKey.slice(0, API_KEY_PREFIX_LENGTH);
+    const matchingKeys = await db
+        .select({
+            id: apiKey.id,
+            userId: apiKey.userId,
+            domainId: apiKey.domainId,
+            keyHash: apiKey.keyHash,
+            permissions: apiKey.permissions,
+            domain: domain.domain,
+            domainStatus: domain.status,
+            sesConfigurationSet: domain.sesConfigurationSet,
+        })
+        .from(apiKey)
+        .innerJoin(domain, eq(apiKey.domainId, domain.id))
+        .where(eq(apiKey.keyPrefix, keyPrefix));
+
+    const authenticatedKey = matchingKeys.find((key) =>
+        verifyApiKey(rawKey, key.keyHash),
+    );
+
+    if (!authenticatedKey) {
+        return null;
+    }
+
+    await db
+        .update(apiKey)
+        .set({ lastUsedAt: new Date() })
+        .where(eq(apiKey.id, authenticatedKey.id));
+
+    const { keyHash, ...publicKey } = authenticatedKey;
+    void keyHash;
+
+    return publicKey;
+}
