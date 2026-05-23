@@ -1,4 +1,4 @@
-import { Search, LayoutGrid, Plus, Loader2 } from "lucide-react";
+import { Globe2, LayoutGrid, Plus, Search } from "lucide-react";
 
 import {
     Sidebar,
@@ -52,7 +52,8 @@ export async function AppSidebar({
                 <SidebarGroup className="p-0">
                     <SidebarMenu className="gap-0">
                         {[
-                            { title: "New chat", icon: Plus, href: "/" },
+                            { title: "Dashboard", icon: Plus, href: "/dashboard" },
+                            { title: "Domains", icon: Globe2, href: "/dashboard" },
                             { title: "Search", icon: Search, href: "/" },
                             { title: "Images", icon: LayoutGrid, href: "/" },
                         ].map((item) => (
